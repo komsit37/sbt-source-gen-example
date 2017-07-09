@@ -1,0 +1,6 @@
+# check if the file gets created
+> genDemo
+$ exists target/scala-2.12/src_managed/main/gendemo/Test1.scala
+$ exists target/scala-2.12/src_managed/main/gendemo/Test2.scala
+#$ pause
+> test

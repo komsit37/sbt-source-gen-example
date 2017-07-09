@@ -1,15 +1,18 @@
 import Dependencies._
 
+//https://github.com/coursier/coursier/issues/236
+resolvers += Resolver.typesafeIvyRepo("releases") //for sbt scripted test
+
 lazy val baseSettings = Seq(
   organization := "com.folio_sec",
   version := "0.1.0-SNAPSHOT",
   scalacOptions ++= _scalaOptions,
   incOptions := sbt.inc.IncOptions.Default,
-  transitiveClassifiers in Global := Seq(Artifact.SourceClassifier),
-  publishMavenStyle := true,
-  pomIncludeRepository := (_ => false),
-  scalafmtOnCompile := true,
-  pomExtra := _pomExtra
+  transitiveClassifiers in Global := Seq(Artifact.SourceClassifier)
+//  publishMavenStyle := true,
+//  pomIncludeRepository := (_ => false),
+//  scalafmtOnCompile := true,
+//  pomExtra := _pomExtra
 )
 
 lazy val `sbt-plugin-example` = (project in file("sbt-plugin-example"))
@@ -24,7 +27,12 @@ lazy val `sbt-plugin-example` = (project in file("sbt-plugin-example"))
       // ant             % Compile,
       // reladomogen     % Compile,
       // reladomogenUtil % Compile
-    )
+    ),
+    ScriptedPlugin.scriptedSettings,
+      scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+      Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+    },
+      scriptedBufferLog := false
   )
 
 lazy val gitRepositoryName = "sbt-plugin-seed"

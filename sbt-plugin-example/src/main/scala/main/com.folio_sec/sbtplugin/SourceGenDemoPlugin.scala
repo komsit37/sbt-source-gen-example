@@ -1,25 +1,26 @@
 package main.com.folio_sec.sbtplugin
 
 import sbt.{File, _}
-import sbt.Keys._
+import sbt.Keys.{sourceGenerators, _}
 
 object SourceGenDemoPlugin extends AutoPlugin {
   // by defining autoImport, the settings are automatically imported into user's `*.sbt`
   object autoImport {
     // configuration points, like the built-in `version`, `libraryDependencies`, or `compile`
-    val demoGen = taskKey[Seq[File]]("demo gen")
-    val demoGenOutputFolder = SettingKey[File](
-      "demo-gen-output-folder",
+    val genDemo = taskKey[Seq[java.io.File]]("gen-demo")
+    val genDemoOutputFolder = SettingKey[java.io.File](
+      "gen-demo-output-folder",
       "output folder for generated files (defaults to sourceManaged)"
     )
 
     // default values for the tasks and settings
     lazy val defaultDemoGenSettings: Seq[Def.Setting[_]] = Seq(
-      demoGen := {
-        SourceGen(demoGenOutputFolder.value)
-      },
-      demoGenOutputFolder in Compile := (sourceManaged in Compile).value / "gendemo",
-      demoGenOutputFolder in Test := (sourceManaged in Test).value / "gendemo"
+      genDemoOutputFolder in Compile := (sourceManaged in Compile).value / "gendemo",
+      genDemoOutputFolder in Test := (sourceManaged in Test).value / "gendemo",
+      genDemo := {
+        SourceGen(genDemoOutputFolder.value)
+      }
+      ,sourceGenerators += genDemo.taskValue
     )
   }
 
@@ -31,20 +32,21 @@ object SourceGenDemoPlugin extends AutoPlugin {
 
   // a group of settings that are automatically added to projects.
   override val projectSettings =
-    inConfig(Compile)(defaultDemoGenSettings) ++
-      inConfig(Test)(defaultDemoGenSettings)
+    inConfig(Compile)(defaultDemoGenSettings) //++
+//      inConfig(Test)(defaultDemoGenSettings)
 }
 
 object SourceGen {
   def apply(base: File): Seq[File] = {
-    val file = base / "Test.scala"
+    println(s"Generating sources to ${base.getAbsoluteFile.getAbsolutePath}...")
+    val file = base / "Test1.scala"
     IO.write(file,
              """package gendemo
-        |object Test extends App { println("Hi") }""".stripMargin)
+        |object Test1 extends App { println("Hi") }""".stripMargin)
     val file2 = base / "Test2.scala"
     IO.write(file2,
              """package gendemo
         |object Test2 { val x = 1 }""".stripMargin)
-    Seq(file)
+    Seq(file, file2)
   }
 }
