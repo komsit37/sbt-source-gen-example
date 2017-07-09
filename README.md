@@ -9,6 +9,6 @@
 ```
 cd sample-project
 sbt compile
-> demoGen
-> test:demoGen
+> genDemo
+> test:genDemo
 ```
