@@ -18,8 +18,8 @@ object SourceGenDemoPlugin extends AutoPlugin {
       demoGen := {
         SourceGen(demoGenOutputFolder.value)
       },
-      demoGenOutputFolder in Compile := (sourceManaged in Compile).value / "gen-demo",
-      demoGenOutputFolder in Test := (sourceManaged in Test).value / "gen-demo"
+      demoGenOutputFolder in Compile := (sourceManaged in Compile).value / "gendemo",
+      demoGenOutputFolder in Test := (sourceManaged in Test).value / "gendemo"
     )
   }
 
@@ -38,7 +38,13 @@ object SourceGenDemoPlugin extends AutoPlugin {
 object SourceGen {
   def apply(base: File): Seq[File] = {
     val file = base / "Test.scala"
-    IO.write(file, """object Test extends App { println("Hi") }""")
+    IO.write(file,
+             """package gendemo
+        |object Test extends App { println("Hi") }""".stripMargin)
+    val file2 = base / "Test2.scala"
+    IO.write(file2,
+             """package gendemo
+        |object Test2 { val x = 1 }""".stripMargin)
     Seq(file)
   }
 }
